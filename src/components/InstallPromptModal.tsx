@@ -85,16 +85,45 @@ export const InstallPromptModal: React.FC<InstallPromptModalProps> = ({
           ) : (
             <>
               {/* Feature Highlights */}
-              <div className="grid grid-cols-2 gap-2.5 text-left">
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                  <span className="text-lg">⚡</span>
-                  <p className="text-xs font-bold text-slate-800 mt-1">Instant 1-Tap Access</p>
-                  <p className="text-[10px] text-slate-500">Opens instantly like a native mobile application.</p>
+              <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-center gap-3.5">
+                <div className="w-14 h-14 rounded-2xl bg-white shadow-md border border-slate-200/90 flex items-center justify-center p-1.5 shrink-0 overflow-hidden">
+                  {userProfile.companyLogoUrl ? (
+                    <img
+                      src={userProfile.companyLogoUrl}
+                      alt="Company App Icon"
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <div className="w-full h-full rounded-xl bg-indigo-600 flex items-center justify-center text-white">
+                      <Smartphone className="w-6 h-6" />
+                    </div>
+                  )}
                 </div>
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                  <span className="text-lg">📱</span>
-                  <p className="text-xs font-bold text-slate-800 mt-1">Full-Screen Display</p>
-                  <p className="text-[10px] text-slate-500">No browser address bar or distraction.</p>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] font-bold text-indigo-900 uppercase tracking-wider">
+                    Home Screen App Icon
+                  </p>
+                  <p className="text-xs font-bold text-slate-800 truncate">
+                    {userProfile.companyName || 'Daily Report App'}
+                  </p>
+                  <p className="text-[10px] text-slate-500 mt-0.5">
+                    {userProfile.companyLogoUrl 
+                      ? 'Your custom company logo will be used on your phone home screen.' 
+                      : 'Upload a logo in Settings to customize this app icon.'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-left">
+                <div className="p-2.5 bg-indigo-50/60 rounded-xl border border-indigo-100">
+                  <span className="text-base">⚡</span>
+                  <p className="text-xs font-bold text-indigo-950 mt-0.5">1-Tap Instant Launch</p>
+                  <p className="text-[10px] text-slate-600">Opens like a native mobile application.</p>
+                </div>
+                <div className="p-2.5 bg-indigo-50/60 rounded-xl border border-indigo-100">
+                  <span className="text-base">📱</span>
+                  <p className="text-xs font-bold text-indigo-950 mt-0.5">Full Standalone Mode</p>
+                  <p className="text-[10px] text-slate-600">Maximized screen space, no address bar.</p>
                 </div>
               </div>
 

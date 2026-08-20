@@ -20,6 +20,7 @@ import { UserProfile, AppState } from '../types';
 import { APPS_SCRIPT_SNIPPET } from '../utils/googleSheetsSync';
 import { DAY_NAMES } from '../utils/dateUtils';
 import { uploadLogoImage } from '../utils/cloudinaryUpload';
+import { updatePwaManifestAndIcons } from '../utils/pwaIconUpdater';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -80,6 +81,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         companyLogoUrl: result.url,
       }));
 
+      // Update PWA icons immediately
+      updatePwaManifestAndIcons(result.url, profile.companyName);
+
       if (result.source === 'cloudinary') {
         setUploadStatus('✓ Uploaded to Cloudinary & synced to Firebase!');
       } else {
@@ -99,6 +103,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       ...prev,
       companyLogoUrl: '',
     }));
+    updatePwaManifestAndIcons('', profile.companyName);
   };
 
   const handleDayToggle = (dayIndex: number) => {

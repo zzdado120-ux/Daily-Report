@@ -37,6 +37,7 @@ import { ExportModal } from './components/ExportModal';
 import { SettingsModal } from './components/SettingsModal';
 import { InstallPromptModal } from './components/InstallPromptModal';
 import { usePWAInstall } from './hooks/usePWAInstall';
+import { updatePwaManifestAndIcons } from './utils/pwaIconUpdater';
 
 export default function App() {
   const [appState, setAppState] = useState<AppState>(() => loadAppState());
@@ -122,6 +123,14 @@ export default function App() {
   useEffect(() => {
     saveAppState(appState);
   }, [appState]);
+
+  // Dynamically update PWA Manifest, Apple Touch Icon, and Favicon with Company Logo
+  useEffect(() => {
+    updatePwaManifestAndIcons(
+      appState.userProfile.companyLogoUrl,
+      appState.userProfile.companyName
+    );
+  }, [appState.userProfile.companyLogoUrl, appState.userProfile.companyName]);
 
   // Retrieve or initialize report for currently selected date
   const currentReport: DayReport = useMemo(() => {
