@@ -296,8 +296,8 @@ export const Checklist: React.FC<ChecklistProps> = ({
 
                       {/* Status Tag */}
                       {task.isCompleted ? (
-                        <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
-                          DONE ({task.completedAt})
+                        <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full">
+                          DONE
                         </span>
                       ) : (
                         <span className="text-[10px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">

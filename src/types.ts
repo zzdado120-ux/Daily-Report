@@ -37,6 +37,12 @@ export interface UserProfile {
   employeeName: string;
   department: string;
   supervisorName: string;
+  companyName?: string; // Company or Organization name
+  companyLogoUrl?: string; // Cloudinary or persistent image URL
+  cloudinaryCloudName?: string; // Custom Cloudinary Cloud Name
+  cloudinaryUploadPreset?: string; // Custom Cloudinary Upload Preset (Unsigned)
+  cloudinaryApiKey?: string; // Cloudinary API Key
+  cloudinaryApiSecret?: string; // Cloudinary API Secret
   offDays: number[]; // 1 = Monday, 0 = Sunday, etc. Default [1] (Monday)
   googleSheetWebAppUrl?: string;
   autoSyncGoogleSheets?: boolean;

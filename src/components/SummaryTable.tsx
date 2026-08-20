@@ -280,14 +280,13 @@ export const SummaryTable: React.FC<SummaryTableProps> = ({
                 <th className="py-3 px-4 border-b border-slate-800">Task / Activity</th>
                 <th className="py-3 px-[11px] border-b border-slate-800 bg-red-700 text-center">Schedule</th>
                 <th className="py-3 px-4 border-b border-slate-800 text-center">Status</th>
-                <th className="py-3 px-4 border-b border-slate-800">Time Checked</th>
                 <th className="py-3 px-4 border-b border-slate-800">Remarks / Notes</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 font-medium">
               {flattenedLogs.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="py-12 text-center text-slate-400">
+                  <td colSpan={7} className="py-12 text-center text-slate-400">
                     No log records match your current filter query.
                   </td>
                 </tr>
@@ -342,10 +341,6 @@ export const SummaryTable: React.FC<SummaryTableProps> = ({
                           PENDING
                         </span>
                       )}
-                    </td>
-
-                    <td className="py-3 px-4 text-slate-600 whitespace-nowrap font-mono text-[11px]">
-                      {log.completedAt || '-'}
                     </td>
 
                     <td className="py-3 px-4 text-slate-500 max-w-sm truncate italic">

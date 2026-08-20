@@ -19,6 +19,12 @@ export const INITIAL_USER_PROFILE: UserProfile = {
   employeeName: 'ROTH DARO',
   department: 'Operations & Platform Management',
   supervisorName: 'Operations Lead',
+  companyName: 'Operations Enterprise',
+  companyLogoUrl: '',
+  cloudinaryCloudName: 'dismpss5e',
+  cloudinaryUploadPreset: 'REPORT',
+  cloudinaryApiKey: '335545523274868',
+  cloudinaryApiSecret: 'TMe5NO5FXq9H54J7O_XhBNex9AM',
   offDays: [1], // Monday is Holiday
   autoSyncGoogleSheets: false,
 };

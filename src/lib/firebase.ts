@@ -4,12 +4,12 @@ import { getFirestore } from 'firebase/firestore';
 import firebaseConfigData from '../../firebase-applet-config.json';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBsbPev3qqO2HjPOq-4Aus6BOFYodMoYBk",
-  authDomain: "course-web-bc7de.firebaseapp.com",
-  projectId: "course-web-bc7de",
-  storageBucket: "course-web-bc7de.firebasestorage.app",
-  messagingSenderId: "94502967366",
-  appId: "1:94502967366:web:b5af7ebc76fb23ee67d247"
+  apiKey: firebaseConfigData.apiKey,
+  authDomain: firebaseConfigData.authDomain,
+  projectId: firebaseConfigData.projectId,
+  storageBucket: firebaseConfigData.storageBucket,
+  messagingSenderId: firebaseConfigData.messagingSenderId,
+  appId: firebaseConfigData.appId,
 };
 
 // Initialize Firebase app
@@ -18,7 +18,10 @@ const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 // Initialize Firebase Auth
 export const auth = getAuth(app);
 
-export const db = getFirestore(app);
+// Initialize Firestore with specific databaseId if provided
+export const db = firebaseConfigData.firestoreDatabaseId && firebaseConfigData.firestoreDatabaseId !== '(default)'
+  ? getFirestore(app, firebaseConfigData.firestoreDatabaseId)
+  : getFirestore(app);
 
 // Auth helpers
 export const googleProvider = new GoogleAuthProvider();
@@ -48,3 +51,4 @@ export async function logout(): Promise<void> {
 export function subscribeToAuth(callback: (user: User | null) => void) {
   return onAuthStateChanged(auth, callback);
 }
+

@@ -25,17 +25,17 @@ export async function exportReportToExcel(report: DayReport, userProfile: UserPr
   worksheet.columns = [
     { key: 'no', width: 8 },
     { key: 'timeSlot', width: 18 },
-    { key: 'taskName', width: 32 },
+    { key: 'taskName', width: 34 },
     { key: 'scheduleType', width: 16 },
     { key: 'status', width: 16 },
-    { key: 'completedAt', width: 20 },
-    { key: 'notes', width: 30 }
+    { key: 'notes', width: 32 }
   ];
 
-  // 1. TOP HEADER BANNER - YELLOW (Merged A1:G1)
-  worksheet.mergeCells('A1:G1');
+  // 1. TOP HEADER BANNER - YELLOW (Merged A1:F1)
+  worksheet.mergeCells('A1:F1');
   const titleCell = worksheet.getCell('A1');
-  titleCell.value = `DAILY REPORT / ${formattedText.toUpperCase()} / ${userProfile.employeeName.toUpperCase()}`;
+  const companyPrefix = userProfile.companyName ? `${userProfile.companyName.toUpperCase()} - ` : '';
+  titleCell.value = `${companyPrefix}DAILY REPORT / ${formattedText.toUpperCase()} / ${userProfile.employeeName.toUpperCase()}`;
   titleCell.font = { name: 'Calibri', size: 14, bold: true, color: { argb: 'FF0F172A' } };
   titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
   titleCell.fill = {
@@ -50,7 +50,7 @@ export async function exportReportToExcel(report: DayReport, userProfile: UserPr
   worksheet.getCell('A2').value = `Department: ${userProfile.department}`;
   worksheet.getCell('A2').font = { name: 'Calibri', size: 10, italic: true };
 
-  worksheet.mergeCells('D2:G2');
+  worksheet.mergeCells('D2:F2');
   worksheet.getCell('D2').value = `Supervisor: ${userProfile.supervisorName}`;
   worksheet.getCell('D2').font = { name: 'Calibri', size: 10, italic: true };
   worksheet.getCell('D2').alignment = { horizontal: 'right' };
@@ -61,7 +61,7 @@ export async function exportReportToExcel(report: DayReport, userProfile: UserPr
   worksheet.getRow(3).height = 10;
 
   // 3. TABLE HEADERS (Row 4)
-  const headers = ['No.', 'Time Slot', 'Task / Activity', 'Schedule', 'Status', 'Time Checked', 'Remarks'];
+  const headers = ['No.', 'Time Slot', 'Task / Activity', 'Schedule', 'Status', 'Remarks'];
   const headerRow = worksheet.getRow(4);
   headerRow.height = 26;
 
@@ -100,7 +100,7 @@ export async function exportReportToExcel(report: DayReport, userProfile: UserPr
 
   if (report.isHoliday) {
     // Holiday row
-    worksheet.mergeCells(`A${startRow}:G${startRow}`);
+    worksheet.mergeCells(`A${startRow}:F${startRow}`);
     const holidayCell = worksheet.getCell(`A${startRow}`);
     holidayCell.value = `🏖️ HOLIDAY — ${dayOfWeek.toUpperCase()} OFF DAY (NO SCHEDULED TASKS)`;
     holidayCell.font = { name: 'Calibri', size: 12, bold: true, color: { argb: 'FFB45309' } };
@@ -113,7 +113,7 @@ export async function exportReportToExcel(report: DayReport, userProfile: UserPr
     worksheet.getRow(startRow).height = 32;
     startRow++;
   } else if (!report.tasks || report.tasks.length === 0) {
-    worksheet.mergeCells(`A${startRow}:G${startRow}`);
+    worksheet.mergeCells(`A${startRow}:F${startRow}`);
     const emptyCell = worksheet.getCell(`A${startRow}`);
     emptyCell.value = 'No tasks recorded for this date.';
     emptyCell.alignment = { horizontal: 'center', vertical: 'middle' };
@@ -133,8 +133,7 @@ export async function exportReportToExcel(report: DayReport, userProfile: UserPr
       row.getCell(3).value = task.taskName; // Task
       row.getCell(4).value = scheduleText; // Schedule
       row.getCell(5).value = statusText; // Status
-      row.getCell(6).value = task.completedAt || '-'; // Time checked
-      row.getCell(7).value = task.notes || '-'; // Remarks
+      row.getCell(6).value = task.notes || '-'; // Remarks
 
       // Alignments & Styles
       row.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
@@ -142,8 +141,7 @@ export async function exportReportToExcel(report: DayReport, userProfile: UserPr
       row.getCell(3).alignment = { horizontal: 'left', vertical: 'middle' };
       row.getCell(4).alignment = { horizontal: 'center', vertical: 'middle' };
       row.getCell(5).alignment = { horizontal: 'center', vertical: 'middle' };
-      row.getCell(6).alignment = { horizontal: 'center', vertical: 'middle' };
-      row.getCell(7).alignment = { horizontal: 'left', vertical: 'middle' };
+      row.getCell(6).alignment = { horizontal: 'left', vertical: 'middle' };
 
       // STYLING SPECIFIC RED "SCHEDULE" COLUMN
       const scheduleCell = row.getCell(4);
@@ -176,7 +174,7 @@ export async function exportReportToExcel(report: DayReport, userProfile: UserPr
       const isEven = index % 2 === 0;
       const rowBg = isEven ? 'FFFFFFFF' : 'FFF8FAFC';
 
-      [1, 2, 3, 6, 7].forEach((colIdx) => {
+      [1, 2, 3, 6].forEach((colIdx) => {
         const c = row.getCell(colIdx);
         c.fill = {
           type: 'pattern',
@@ -186,7 +184,7 @@ export async function exportReportToExcel(report: DayReport, userProfile: UserPr
       });
 
       // Borders
-      for (let c = 1; c <= 7; c++) {
+      for (let c = 1; c <= 6; c++) {
         row.getCell(c).border = {
           top: { style: 'thin', color: { argb: 'FFE2E8F0' } },
           left: { style: 'thin', color: { argb: 'FFE2E8F0' } },
@@ -225,10 +223,10 @@ export async function exportReportToExcel(report: DayReport, userProfile: UserPr
   worksheet.getCell(`A${startRow}`).value = `Prepared by: _____________________ (${userProfile.employeeName})`;
   worksheet.getCell(`A${startRow}`).font = { name: 'Calibri', size: 10, italic: true };
 
-  worksheet.mergeCells(`E${startRow}:G${startRow}`);
-  worksheet.getCell(`E${startRow}`).value = `Approved by: _____________________ (${userProfile.supervisorName})`;
-  worksheet.getCell(`E${startRow}`).font = { name: 'Calibri', size: 10, italic: true };
-  worksheet.getCell(`E${startRow}`).alignment = { horizontal: 'right' };
+  worksheet.mergeCells(`D${startRow}:F${startRow}`);
+  worksheet.getCell(`D${startRow}`).value = `Approved by: _____________________ (${userProfile.supervisorName})`;
+  worksheet.getCell(`D${startRow}`).font = { name: 'Calibri', size: 10, italic: true };
+  worksheet.getCell(`D${startRow}`).alignment = { horizontal: 'right' };
 
   // Write workbook to buffer and trigger browser download
   const buffer = await workbook.xlsx.writeBuffer();
@@ -255,24 +253,24 @@ export async function exportAllReportsToExcel(reportsList: DayReport[], userProf
     { key: 'day', width: 12 },
     { key: 'status', width: 14 },
     { key: 'timeSlot', width: 16 },
-    { key: 'task', width: 30 },
+    { key: 'task', width: 32 },
     { key: 'schedule', width: 14 },
     { key: 'taskStatus', width: 12 },
-    { key: 'timeChecked', width: 18 },
     { key: 'remarks', width: 28 }
   ];
 
   // Title
-  masterSheet.mergeCells('A1:I1');
+  masterSheet.mergeCells('A1:H1');
   const title = masterSheet.getCell('A1');
-  title.value = `ALL DAILY REPORTS SUMMARY - ${userProfile.employeeName.toUpperCase()} (${userProfile.department})`;
+  const companyPrefix = userProfile.companyName ? `${userProfile.companyName.toUpperCase()} - ` : '';
+  title.value = `${companyPrefix}ALL DAILY REPORTS SUMMARY - ${userProfile.employeeName.toUpperCase()} (${userProfile.department})`;
   title.font = { name: 'Calibri', size: 13, bold: true, color: { argb: 'FF0F172A' } };
   title.alignment = { horizontal: 'center', vertical: 'middle' };
   title.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFDE047' } };
   masterSheet.getRow(1).height = 32;
 
   // Header Row
-  const headers = ['Date', 'Day', 'Day Type', 'Time Slot', 'Task / Activity', 'Schedule', 'Status', 'Time Checked', 'Remarks'];
+  const headers = ['Date', 'Day', 'Day Type', 'Time Slot', 'Task / Activity', 'Schedule', 'Status', 'Remarks'];
   const headerRow = masterSheet.getRow(3);
   headerRow.height = 24;
 
@@ -303,7 +301,6 @@ export async function exportAllReportsToExcel(reportsList: DayReport[], userProf
       row.getCell(6).value = '-';
       row.getCell(7).value = '-';
       row.getCell(8).value = '-';
-      row.getCell(9).value = '-';
 
       row.font = { name: 'Calibri', size: 10, italic: true };
       row.getCell(3).font = { bold: true, color: { argb: 'FFB45309' } };
@@ -318,8 +315,7 @@ export async function exportAllReportsToExcel(reportsList: DayReport[], userProf
         row.getCell(5).value = task.taskName;
         row.getCell(6).value = task.scheduleType || 'Schedule';
         row.getCell(7).value = task.isCompleted ? 'DONE' : 'PENDING';
-        row.getCell(8).value = task.completedAt || '-';
-        row.getCell(9).value = task.notes || '-';
+        row.getCell(8).value = task.notes || '-';
 
         // Red Schedule cell
         row.getCell(6).font = { bold: true, color: { argb: 'FFB91C1C' } };

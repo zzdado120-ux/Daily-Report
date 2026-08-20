@@ -1,6 +1,6 @@
 {
   "name": "Daily Report Schedule Tracker",
-  "description": "Automated daily schedule checklist and report generator with auto-date detection, Monday holiday rule, live summary table, and Excel/PDF export.",
+  "description": "Automated daily schedule checklist and report generator with PWA home screen installation, custom company branding with Cloudinary logo upload, Firebase real-time sync, and Excel/PDF exports.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

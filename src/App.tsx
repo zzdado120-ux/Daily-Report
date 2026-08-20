@@ -35,11 +35,25 @@ import { SummaryTable } from './components/SummaryTable';
 import { TemplateEditorModal } from './components/TemplateEditorModal';
 import { ExportModal } from './components/ExportModal';
 import { SettingsModal } from './components/SettingsModal';
+import { InstallPromptModal } from './components/InstallPromptModal';
+import { usePWAInstall } from './hooks/usePWAInstall';
 
 export default function App() {
   const [appState, setAppState] = useState<AppState>(() => loadAppState());
   const [selectedDate, setSelectedDate] = useState<string>(() => formatDateKey(new Date()));
   const [currentView, setCurrentView] = useState<'checklist' | 'summary'>('checklist');
+
+  // PWA Install Hook
+  const {
+    canInstall,
+    deferredPromptAvailable,
+    isInstalled,
+    isIOS,
+    isInstallModalOpen,
+    openInstallModal,
+    closeInstallModal,
+    triggerInstall,
+  } = usePWAInstall();
 
   // Firebase Auth state
   const [authUser, setAuthUser] = useState<AuthUser | null>(null);
@@ -353,6 +367,8 @@ export default function App() {
         onOpenExportModal={() => setIsExportModalOpen(true)}
         onOpenTemplateModal={() => setIsTemplateModalOpen(true)}
         onOpenSettingsModal={() => setIsSettingsModalOpen(true)}
+        onOpenInstallModal={triggerInstall}
+        isInstalled={isInstalled}
         completionPercentage={completionPercentage}
         isHoliday={currentReport.isHoliday}
       />
@@ -420,6 +436,16 @@ export default function App() {
         onSaveProfile={handleSaveProfile}
         appState={appState}
         onRestoreState={handleRestoreState}
+      />
+
+      <InstallPromptModal
+        isOpen={isInstallModalOpen}
+        onClose={closeInstallModal}
+        onNativeInstall={triggerInstall}
+        deferredPromptAvailable={deferredPromptAvailable}
+        isIOS={isIOS}
+        isInstalled={isInstalled}
+        userProfile={appState.userProfile}
       />
 
     </div>

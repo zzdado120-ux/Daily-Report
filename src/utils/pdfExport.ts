@@ -3,9 +3,45 @@ import { DayReport, UserProfile } from '../types';
 import { formatFullDateHeader } from './dateUtils';
 
 /**
- * Generates a clean PDF document of the Daily Report using jsPDF
+ * Loads an image URL and converts it to base64 Data URL for jsPDF embedding
  */
-export function exportReportToPDF(report: DayReport, userProfile: UserProfile): void {
+async function loadImageDataUrl(url: string): Promise<string | null> {
+  if (!url) return null;
+  if (url.startsWith('data:image/')) {
+    return url;
+  }
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = 'Anonymous';
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth || img.width || 200;
+        canvas.height = img.naturalHeight || img.height || 200;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(null);
+          return;
+        }
+        ctx.drawImage(img, 0, 0);
+        const dataURL = canvas.toDataURL('image/png');
+        resolve(dataURL);
+      } catch (err) {
+        console.warn('Canvas toDataURL conversion failed:', err);
+        resolve(null);
+      }
+    };
+    img.onerror = () => {
+      resolve(null);
+    };
+    img.src = url;
+  });
+}
+
+/**
+ * Generates a clean PDF document of the Daily Report with Company Logo using jsPDF
+ */
+export async function exportReportToPDF(report: DayReport, userProfile: UserProfile): Promise<void> {
   const doc = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
@@ -22,28 +58,56 @@ export function exportReportToPDF(report: DayReport, userProfile: UserProfile): 
   const lightGray = [248, 250, 252];
   const greenColor = [21, 128, 61];
 
+  // Try to load company logo
+  let logoDataUrl: string | null = null;
+  if (userProfile.companyLogoUrl) {
+    try {
+      logoDataUrl = await loadImageDataUrl(userProfile.companyLogoUrl);
+    } catch (err) {
+      console.warn('Could not load logo for PDF:', err);
+    }
+  }
+
   // 1. TOP HEADER BANNER (Yellow background)
   doc.setFillColor(yellowColor[0], yellowColor[1], yellowColor[2]);
-  doc.rect(10, 10, 190, 16, 'F');
+  doc.rect(10, 10, 190, 18, 'F');
+
+  // If logo exists, render on the left of the banner
+  if (logoDataUrl) {
+    try {
+      // White badge card for logo
+      doc.setFillColor(255, 255, 255);
+      doc.roundedRect(12, 11.5, 15, 15, 1.5, 1.5, 'F');
+      doc.setDrawColor(226, 232, 240);
+      doc.roundedRect(12, 11.5, 15, 15, 1.5, 1.5, 'S');
+      doc.addImage(logoDataUrl, 'PNG', 12.5, 12, 14, 14, undefined, 'FAST');
+    } catch (err) {
+      console.warn('Failed to embed logo into PDF canvas:', err);
+    }
+  }
 
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
+  doc.setFontSize(10.5);
   doc.setTextColor(15, 23, 42); // slate-900
-  const headerTitle = `DAILY REPORT / ${formattedText.toUpperCase()} / ${userProfile.employeeName.toUpperCase()}`;
-  doc.text(headerTitle, 105, 20, { align: 'center' });
+  const companyPrefix = userProfile.companyName ? `${userProfile.companyName.toUpperCase()} - ` : '';
+  const headerTitle = `${companyPrefix}DAILY REPORT / ${formattedText.toUpperCase()} / ${userProfile.employeeName.toUpperCase()}`;
+  
+  // Position title with offset if logo is present
+  const titleX = logoDataUrl ? 112 : 105;
+  doc.text(headerTitle, titleX, 21, { align: 'center' });
 
   // 2. METADATA
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
   doc.setTextColor(71, 85, 105);
-  doc.text(`Department: ${userProfile.department}`, 10, 32);
-  doc.text(`Supervisor: ${userProfile.supervisorName}`, 200, 32, { align: 'right' });
+  doc.text(`Department: ${userProfile.department}`, 10, 34);
+  doc.text(`Supervisor: ${userProfile.supervisorName}`, 200, 34, { align: 'right' });
 
-  // 3. TABLE HEADERS
-  let currentY = 38;
-  const colX = [10, 22, 55, 110, 132, 155, 180];
-  const colWidths = [12, 33, 55, 22, 23, 25, 20];
-  const headers = ['No.', 'Time Slot', 'Task Name', 'Schedule', 'Status', 'Checked At', 'Notes'];
+  // 3. TABLE HEADERS (Removed Checked At column)
+  let currentY = 40;
+  const colX = [10, 22, 57, 122, 145, 168];
+  const colWidths = [12, 35, 65, 23, 23, 32];
+  const headers = ['No.', 'Time Slot', 'Task Name / Activity', 'Schedule', 'Status', 'Notes'];
 
   // Draw Header Background
   doc.setFillColor(darkNavy[0], darkNavy[1], darkNavy[2]);
@@ -62,7 +126,7 @@ export function exportReportToPDF(report: DayReport, userProfile: UserProfile): 
       doc.setTextColor(255, 255, 255);
       doc.text(h, colX[i] + colWidths[i] / 2, currentY + 5.5, { align: 'center' });
     } else {
-      const align = i === 2 || i === 6 ? 'left' : 'center';
+      const align = i === 2 || i === 5 ? 'left' : 'center';
       const posX = align === 'left' ? colX[i] + 2 : colX[i] + colWidths[i] / 2;
       doc.text(h, posX, currentY + 5.5, { align: align as any });
     }
@@ -134,14 +198,11 @@ export function exportReportToPDF(report: DayReport, userProfile: UserProfile): 
         doc.text('PENDING', colX[4] + colWidths[4] / 2, currentY + 5.5, { align: 'center' });
       }
 
-      // Time Checked
+      // Notes (No Checked At column)
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(71, 85, 105);
-      doc.text(task.completedAt || '-', colX[5] + colWidths[5] / 2, currentY + 5.5, { align: 'center' });
-
-      // Notes
-      const notesTruncated = doc.splitTextToSize(task.notes || '-', colWidths[6] - 3)[0] || '-';
-      doc.text(notesTruncated, colX[6] + 2, currentY + 5.5);
+      const notesTruncated = doc.splitTextToSize(task.notes || '-', colWidths[5] - 3)[0] || '-';
+      doc.text(notesTruncated, colX[5] + 2, currentY + 5.5);
 
       currentY += rowHeight;
     });
@@ -176,3 +237,4 @@ export function exportReportToPDF(report: DayReport, userProfile: UserProfile): 
   // Save PDF
   doc.save(`Daily_Report_${report.date}_${userProfile.employeeName.replace(/\s+/g, '_')}.pdf`);
 }
+
