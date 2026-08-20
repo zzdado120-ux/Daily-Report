@@ -1,12 +1,12 @@
 {
-  "projectId": "elegant-forest-66vd8",
-  "appId": "1:624293635413:web:e7d9f128042259a9e5fbdc",
-  "apiKey": "AIzaSyDaQRXpN4Ooo_p5ej-dTGaudf7idAeDfxQ",
-  "authDomain": "elegant-forest-66vd8.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-dailyreportsched-d7f13fda-a8c4-4f52-92a6-7d06f1e0aa31",
-  "storageBucket": "elegant-forest-66vd8.firebasestorage.app",
-  "messagingSenderId": "624293635413",
+  "projectId": "sale-course-495bd",
+  "appId": "1:158707548050:web:a82d73527b72b6846a8b4b",
+  "apiKey": "AIzaSyBmWqoibfdUxUZAvVUzXgZt0840Sq1K8eA",
+  "authDomain": "sale-course-495bd.firebaseapp.com",
+  "firestoreDatabaseId": "(default)",
+  "storageBucket": "sale-course-495bd.firebasestorage.app",
+  "messagingSenderId": "158707548050",
   "measurementId": "",
-  "oAuthClientId": "624293635413-a4n6hrjs2gdap0f9d9lmiulemfr3fu18.apps.googleusercontent.com",
+  "oAuthClientId": "",
   "recaptchaSiteKey": ""
 }

@@ -3,22 +3,23 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChang
 import { getFirestore } from 'firebase/firestore';
 import firebaseConfigData from '../../firebase-applet-config.json';
 
-const firebaseConfig = {
-  apiKey: firebaseConfigData.apiKey,
-  authDomain: firebaseConfigData.authDomain,
-  projectId: firebaseConfigData.projectId,
-  storageBucket: firebaseConfigData.storageBucket,
-  messagingSenderId: firebaseConfigData.messagingSenderId,
-  appId: firebaseConfigData.appId,
+// Web app's Firebase configuration
+export const firebaseConfig = {
+  apiKey: firebaseConfigData.apiKey || "AIzaSyBmWqoibfdUxUZAvVUzXgZt0840Sq1K8eA",
+  authDomain: firebaseConfigData.authDomain || "sale-course-495bd.firebaseapp.com",
+  projectId: firebaseConfigData.projectId || "sale-course-495bd",
+  storageBucket: firebaseConfigData.storageBucket || "sale-course-495bd.firebasestorage.app",
+  messagingSenderId: firebaseConfigData.messagingSenderId || "158707548050",
+  appId: firebaseConfigData.appId || "1:158707548050:web:a82d73527b72b6846a8b4b",
 };
 
-// Initialize Firebase app
-const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+// Initialize Firebase
+export const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 
 // Initialize Firebase Auth
 export const auth = getAuth(app);
 
-// Initialize Firestore with specific databaseId if provided
+// Initialize Firestore
 export const db = firebaseConfigData.firestoreDatabaseId && firebaseConfigData.firestoreDatabaseId !== '(default)'
   ? getFirestore(app, firebaseConfigData.firestoreDatabaseId)
   : getFirestore(app);
