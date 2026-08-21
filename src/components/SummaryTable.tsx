@@ -10,7 +10,9 @@ import {
   Download,
   FileSpreadsheet,
   BarChart3,
-  Tag
+  Tag,
+  Check,
+  X
 } from 'lucide-react';
 import { DayReport, UserProfile } from '../types';
 import { exportAllReportsToExcel } from '../utils/excelExport';
@@ -177,12 +179,12 @@ export const SummaryTable: React.FC<SummaryTableProps> = ({
 
         <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-bold text-amber-600 uppercase tracking-wider">Pending</p>
-            <p className="text-2xl font-black text-amber-700 mt-1">{stats.pendingTasks}</p>
-            <p className="text-[11px] text-amber-600/80 mt-0.5">Awaiting check-off</p>
+            <p className="text-xs font-bold text-rose-600 uppercase tracking-wider">Pending</p>
+            <p className="text-2xl font-black text-rose-700 mt-1">{stats.pendingTasks}</p>
+            <p className="text-[11px] text-rose-600/80 mt-0.5">Awaiting check-off</p>
           </div>
-          <div className="w-11 h-11 bg-amber-100 text-amber-700 rounded-xl flex items-center justify-center">
-            <Clock className="w-6 h-6" />
+          <div className="w-11 h-11 bg-rose-100 text-rose-700 rounded-xl flex items-center justify-center">
+            <X className="w-6 h-6 stroke-[2.5]" />
           </div>
         </div>
 
@@ -228,19 +230,23 @@ export const SummaryTable: React.FC<SummaryTableProps> = ({
             </button>
             <button
               onClick={() => setStatusFilter('completed')}
-              className={`px-3 py-1 rounded-lg transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all ${
                 statusFilter === 'completed' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
               }`}
+              title="Done / Completed"
             >
-              Done
+              <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>Done</span>
             </button>
             <button
               onClick={() => setStatusFilter('pending')}
-              className={`px-3 py-1 rounded-lg transition-all ${
-                statusFilter === 'pending' ? 'bg-amber-500 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all ${
+                statusFilter === 'pending' ? 'bg-rose-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'
               }`}
+              title="Pending"
             >
-              Pending
+              <X className="w-3.5 h-3.5 stroke-[2.5]" />
+              <span>Pending</span>
             </button>
           </div>
 
@@ -326,19 +332,25 @@ export const SummaryTable: React.FC<SummaryTableProps> = ({
                       )}
                     </td>
 
-                    {/* Status Badge */}
+                    {/* Status Badge: Check Icon / Cross Icon */}
                     <td className="py-3 px-4 text-center whitespace-nowrap">
                       {log.isHoliday ? (
                         <span className="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full text-[10px]">
                           HOLIDAY
                         </span>
                       ) : log.isCompleted ? (
-                        <span className="bg-emerald-100 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full text-[10px]">
-                          DONE
+                        <span
+                          className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-300 shadow-xs mx-auto"
+                          title="Done"
+                        >
+                          <Check className="w-3.5 h-3.5 stroke-[2.5]" />
                         </span>
                       ) : (
-                        <span className="bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full text-[10px]">
-                          PENDING
+                        <span
+                          className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-rose-100 text-rose-700 border border-rose-300 shadow-xs mx-auto"
+                          title="Pending"
+                        >
+                          <X className="w-3.5 h-3.5 stroke-[2.5]" />
                         </span>
                       )}
                     </td>

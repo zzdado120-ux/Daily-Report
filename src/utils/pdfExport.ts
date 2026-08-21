@@ -188,14 +188,36 @@ export async function exportReportToPDF(report: DayReport, userProfile: UserProf
       doc.setTextColor(redColor[0], redColor[1], redColor[2]);
       doc.text('Schedule', colX[3] + colWidths[3] / 2, currentY + 5.5, { align: 'center' });
 
-      // Status
-      doc.setFont('helvetica', 'bold');
+      // Status - Vector Icon Badge (Guaranteed visible rendering in all PDF readers)
+      const iconCenterX = colX[4] + colWidths[4] / 2;
+      const iconCenterY = currentY + rowHeight / 2;
+
       if (task.isCompleted) {
-        doc.setTextColor(greenColor[0], greenColor[1], greenColor[2]);
-        doc.text('DONE', colX[4] + colWidths[4] / 2, currentY + 5.5, { align: 'center' });
+        // Green badge background
+        doc.setFillColor(220, 252, 231); // emerald-100
+        doc.circle(iconCenterX, iconCenterY, 2.5, 'F');
+        doc.setDrawColor(187, 247, 208); // emerald-200
+        doc.setLineWidth(0.2);
+        doc.circle(iconCenterX, iconCenterY, 2.5, 'S');
+
+        // Crisp Checkmark vector lines
+        doc.setDrawColor(21, 128, 61); // emerald-700
+        doc.setLineWidth(0.5);
+        doc.line(iconCenterX - 1.2, iconCenterY - 0.1, iconCenterX - 0.3, iconCenterY + 0.9);
+        doc.line(iconCenterX - 0.3, iconCenterY + 0.9, iconCenterX + 1.2, iconCenterY - 0.9);
       } else {
-        doc.setTextColor(234, 88, 12);
-        doc.text('PENDING', colX[4] + colWidths[4] / 2, currentY + 5.5, { align: 'center' });
+        // Red badge background
+        doc.setFillColor(254, 226, 226); // rose-100
+        doc.circle(iconCenterX, iconCenterY, 2.5, 'F');
+        doc.setDrawColor(254, 205, 211); // rose-200
+        doc.setLineWidth(0.2);
+        doc.circle(iconCenterX, iconCenterY, 2.5, 'S');
+
+        // Crisp Cross vector lines
+        doc.setDrawColor(220, 38, 38); // rose-600
+        doc.setLineWidth(0.5);
+        doc.line(iconCenterX - 0.9, iconCenterY - 0.9, iconCenterX + 0.9, iconCenterY + 0.9);
+        doc.line(iconCenterX + 0.9, iconCenterY - 0.9, iconCenterX - 0.9, iconCenterY + 0.9);
       }
 
       // Notes (No Checked At column)

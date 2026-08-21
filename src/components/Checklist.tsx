@@ -11,7 +11,9 @@ import {
   CheckCheck,
   RotateCcw,
   Tag,
-  Calendar
+  Calendar,
+  Check,
+  X
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { ScheduleTask, TaskScope } from '../types';
@@ -294,14 +296,20 @@ export const Checklist: React.FC<ChecklistProps> = ({
                         <span>{task.scheduleType || 'Schedule'}</span>
                       </span>
 
-                      {/* Status Tag */}
+                      {/* Status Tag: Check Icon / Cross Icon */}
                       {task.isCompleted ? (
-                        <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full">
-                          DONE
+                        <span
+                          className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-300 shadow-xs"
+                          title="Done"
+                        >
+                          <Check className="w-3.5 h-3.5 stroke-[2.5]" />
                         </span>
                       ) : (
-                        <span className="text-[10px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">
-                          PENDING
+                        <span
+                          className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-rose-100 text-rose-700 border border-rose-300 shadow-xs"
+                          title="Pending"
+                        >
+                          <X className="w-3.5 h-3.5 stroke-[2.5]" />
                         </span>
                       )}
                     </div>

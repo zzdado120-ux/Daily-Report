@@ -80,3 +80,71 @@ export function addDaysToDateKey(dateStr: string, days: number): string {
   dateObj.setDate(dateObj.getDate() + days);
   return formatDateKey(dateObj);
 }
+
+export interface MonthWeekGroup {
+  weekNumber: number;
+  weekLabel: string;
+  shortLabel: string;
+  startDate: string;
+  endDate: string;
+  reports: any[]; // DayReport[]
+  totalTasks: number;
+  completedTasks: number;
+  pendingTasks: number;
+  completionRate: number;
+  workingDays: number;
+  holidays: number;
+}
+
+/**
+ * Groups days of a target month (YYYY-MM) into calendar weeks (Monday to Sunday)
+ */
+export function getMonthWeekBuckets(year: number, monthIndex: number): Array<{
+  weekNumber: number;
+  startDay: number;
+  endDay: number;
+  startDate: string;
+  endDate: string;
+  label: string;
+}> {
+  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+  const weeks: Array<{
+    weekNumber: number;
+    startDay: number;
+    endDay: number;
+    startDate: string;
+    endDate: string;
+    label: string;
+  }> = [];
+
+  let currentStartDay = 1;
+  let weekNum = 1;
+
+  while (currentStartDay <= daysInMonth) {
+    const curDate = new Date(year, monthIndex, currentStartDay);
+    const dayOfWeek = curDate.getDay(); // 0 = Sunday, 1 = Monday ... 6 = Saturday
+    // Days remaining until Sunday (Sunday is end of week, where Sunday dayOfWeek is 0)
+    const daysUntilSunday = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
+    const endDay = Math.min(currentStartDay + daysUntilSunday, daysInMonth);
+
+    const startStr = `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(currentStartDay).padStart(2, '0')}`;
+    const endStr = `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(endDay).padStart(2, '0')}`;
+    const monthName = MONTH_NAMES[monthIndex].substring(0, 3);
+
+    const label = `Week ${weekNum} (${String(currentStartDay).padStart(2, '0')} ${monthName} - ${String(endDay).padStart(2, '0')} ${monthName} ${year})`;
+
+    weeks.push({
+      weekNumber: weekNum,
+      startDay: currentStartDay,
+      endDay,
+      startDate: startStr,
+      endDate: endStr,
+      label
+    });
+
+    currentStartDay = endDay + 1;
+    weekNum++;
+  }
+
+  return weeks;
+}

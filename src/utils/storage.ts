@@ -75,39 +75,31 @@ export function createNewDayReport(dateStr: string, template: DefaultTimeSlotTem
 }
 
 /**
- * Pre-generate some realistic sample report entries for past few days
+ * Generate fresh clean report for today without mock history
  */
-function getInitialSampleReports(template: DefaultTimeSlotTemplate[], userProfile: UserProfile): Record<string, DayReport> {
+export function getInitialFreshReports(template: DefaultTimeSlotTemplate[], userProfile: UserProfile): Record<string, DayReport> {
   const reports: Record<string, DayReport> = {};
-  const today = new Date();
-
-  // Create entries for past 5 days
-  for (let i = 5; i >= 0; i--) {
-    const d = new Date(today);
-    d.setDate(d.getDate() - i);
-    const dateKey = formatDateKey(d);
-    const report = createNewDayReport(dateKey, template, userProfile);
-
-    // If it's not a holiday and in the past, mark some tasks as completed
-    if (!report.isHoliday && i > 0) {
-      report.tasks = report.tasks.map((task, idx) => {
-        // Complete most tasks for historical realism
-        if (idx < report.tasks.length - 1) {
-          return {
-            ...task,
-            isCompleted: true,
-            completedAt: `${task.timeSlot.split(' - ')[0]}:12:05 AM`,
-            notes: idx === 0 ? 'Platform status normal' : idx === 2 ? 'Post published on main page' : 'Completed on schedule',
-          };
-        }
-        return task;
-      });
-    }
-
-    reports[dateKey] = report;
-  }
-
+  const todayKey = formatDateKey(new Date());
+  reports[todayKey] = createNewDayReport(todayKey, template, userProfile);
   return reports;
+}
+
+/**
+ * Generates a completely new fresh state
+ */
+export function getFreshInitialState(customProfile?: Partial<UserProfile>): AppState {
+  const defaultSchedule = [...INITIAL_DEFAULT_SCHEDULE];
+  const userProfile: UserProfile = {
+    ...INITIAL_USER_PROFILE,
+    ...customProfile,
+  };
+  const reports = getInitialFreshReports(defaultSchedule, userProfile);
+
+  return {
+    reports,
+    defaultSchedule,
+    userProfile,
+  };
 }
 
 /**
@@ -126,19 +118,24 @@ export function loadAppState(): AppState {
     console.warn('Failed to load state from localStorage:', err);
   }
 
-  // Fallback initial state
-  const defaultSchedule = INITIAL_DEFAULT_SCHEDULE;
-  const userProfile = INITIAL_USER_PROFILE;
-  const reports = getInitialSampleReports(defaultSchedule, userProfile);
+  // Fallback initial clean state
+  const fresh = getFreshInitialState();
+  saveAppState(fresh);
+  return fresh;
+}
 
-  const state: AppState = {
-    reports,
-    defaultSchedule,
-    userProfile,
-  };
-
-  saveAppState(state);
-  return state;
+/**
+ * Completely reset localStorage and return clean state
+ */
+export function resetAppState(): AppState {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (err) {
+    console.warn('Failed to remove localStorage key:', err);
+  }
+  const fresh = getFreshInitialState();
+  saveAppState(fresh);
+  return fresh;
 }
 
 /**

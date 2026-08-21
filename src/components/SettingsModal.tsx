@@ -14,7 +14,9 @@ import {
   Trash2, 
   Cloud, 
   Loader2,
-  Sparkles
+  Sparkles,
+  RotateCcw,
+  AlertTriangle
 } from 'lucide-react';
 import { UserProfile, AppState } from '../types';
 import { APPS_SCRIPT_SNIPPET } from '../utils/googleSheetsSync';
@@ -29,6 +31,7 @@ interface SettingsModalProps {
   onSaveProfile: (updatedProfile: UserProfile) => void;
   appState: AppState;
   onRestoreState: (state: AppState) => void;
+  onResetAllData?: () => Promise<void>;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -38,6 +41,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onSaveProfile,
   appState,
   onRestoreState,
+  onResetAllData,
 }) => {
   const [profile, setProfile] = useState<UserProfile>(userProfile);
   const [copiedScript, setCopiedScript] = useState(false);
@@ -45,6 +49,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [showCloudinaryConfig, setShowCloudinaryConfig] = useState(false);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+  const [isResetting, setIsResetting] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -464,7 +470,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">
               Data Management & Backup
             </h3>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <button
                 onClick={handleExportBackup}
                 className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition-all"
@@ -484,6 +490,78 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 />
               </label>
             </div>
+          </div>
+
+          <hr className="border-slate-100" />
+
+          {/* Complete Factory Reset */}
+          <div className="p-4 bg-rose-50/70 border border-rose-200 rounded-2xl space-y-3">
+            <div className="flex items-start gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 mt-0.5">
+                <AlertTriangle className="w-4 h-4" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h4 className="text-xs font-bold text-rose-900 uppercase tracking-wider">
+                  Reset All Data (Fresh Clean Start)
+                </h4>
+                <p className="text-[11px] text-rose-700 mt-0.5 leading-relaxed">
+                  Permanently clear all checklist progress, notes, reports history, and reset all data to a clean fresh state.
+                </p>
+              </div>
+            </div>
+
+            {showResetConfirm ? (
+              <div className="p-3 bg-white border border-rose-300 rounded-xl space-y-2 animate-fadeIn">
+                <p className="text-xs font-bold text-rose-900">
+                  ⚠️ Are you sure? All checklist usage and report data will be wiped clean for a fresh start.
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    disabled={isResetting}
+                    onClick={async () => {
+                      if (onResetAllData) {
+                        setIsResetting(true);
+                        await onResetAllData();
+                        setIsResetting(false);
+                        setShowResetConfirm(false);
+                        onClose();
+                      }
+                    }}
+                    className="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 disabled:opacity-60"
+                  >
+                    {isResetting ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Resetting All Data...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Yes, Reset Everything</span>
+                      </>
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isResetting}
+                    onClick={() => setShowResetConfirm(false)}
+                    className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-all"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setShowResetConfirm(true)}
+                className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-rose-300 hover:bg-rose-100/70 text-rose-700 text-xs font-bold rounded-xl shadow-xs transition-all"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Reset All Usage & Start Clean</span>
+              </button>
+            )}
           </div>
 
         </div>

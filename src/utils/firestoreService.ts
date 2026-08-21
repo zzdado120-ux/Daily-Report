@@ -2,12 +2,54 @@ import {
   doc, 
   setDoc, 
   getDoc, 
+  getDocs,
+  deleteDoc,
   onSnapshot, 
   collection, 
   updateDoc 
 } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { AppState, DayReport, DefaultTimeSlotTemplate, UserProfile } from '../types';
+
+/**
+ * Delete all report documents from Firestore for a specific user
+ */
+export async function clearAllReportsFromFirestore(userId: string): Promise<void> {
+  try {
+    const reportsCollRef = collection(db, 'users', userId, 'reports');
+    const snapshot = await getDocs(reportsCollRef);
+    const deletePromises = snapshot.docs.map((docSnap) => deleteDoc(docSnap.ref));
+    await Promise.all(deletePromises);
+  } catch (error) {
+    console.error('Error clearing reports from Firestore:', error);
+  }
+}
+
+/**
+ * Factory reset user data in Firestore
+ */
+export async function resetAllFirestoreUserData(
+  userId: string,
+  freshState: AppState
+): Promise<void> {
+  try {
+    // 1. Delete all existing reports
+    await clearAllReportsFromFirestore(userId);
+
+    // 2. Overwrite user profile
+    await saveUserProfileToFirestore(userId, freshState.userProfile);
+
+    // 3. Overwrite templates
+    await saveTemplatesToFirestore(userId, freshState.defaultSchedule);
+
+    // 4. Save clean reports
+    for (const dateKey of Object.keys(freshState.reports)) {
+      await saveDayReportToFirestore(userId, freshState.reports[dateKey]);
+    }
+  } catch (error) {
+    console.error('Error resetting all Firestore user data:', error);
+  }
+}
 
 /**
  * Save / Update User Profile in Firestore

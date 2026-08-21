@@ -3,6 +3,8 @@ import { AppState, DayReport, DefaultTimeSlotTemplate, UserProfile, AuthUser, Ta
 import {
   loadAppState,
   saveAppState,
+  resetAppState,
+  getFreshInitialState,
   createNewDayReport,
   INITIAL_DEFAULT_SCHEDULE,
   INITIAL_USER_PROFILE
@@ -24,7 +26,8 @@ import {
   subscribeToUserProfile,
   subscribeToTemplates,
   subscribeToReports,
-  seedInitialFirestoreData
+  seedInitialFirestoreData,
+  resetAllFirestoreUserData
 } from './utils/firestoreService';
 
 import { Header } from './components/Header';
@@ -360,6 +363,19 @@ export default function App() {
     }
   };
 
+  const handleResetAllData = async () => {
+    const freshState = resetAppState();
+    setAppState(freshState);
+    const today = formatDateKey(new Date());
+    setSelectedDate(today);
+
+    if (authUser) {
+      setIsSyncing(true);
+      await resetAllFirestoreUserData(authUser.uid, freshState);
+      setIsSyncing(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-indigo-200 selection:text-slate-900">
       
@@ -445,6 +461,7 @@ export default function App() {
         onSaveProfile={handleSaveProfile}
         appState={appState}
         onRestoreState={handleRestoreState}
+        onResetAllData={handleResetAllData}
       />
 
       <InstallPromptModal
